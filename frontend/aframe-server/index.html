@@ -1,0 +1,92 @@
+<!-- <!DOCTYPE html>
+<html>
+  <head>
+    <title>Hello, WebVR! - A-Frame</title>
+    <meta name="description" content="Hello, WebVR! - A-Frame">
+    <script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene >
+      <a-assets>
+        <a-asset-item id="scifi" src="gl/scene.gltf"></a-asset-item>
+      </a-assets>
+      
+      <a-entity gltf-model="#scifi"></a-entity>
+      
+    <a-entity rotation="0 90 0">
+        <a-box shadow="cast: true" position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+        <a-sphere shadow="cast: true" position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+        <a-cylinder shadow="cast: true" position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+        <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
+      </a-entity>
+      <a-entity rotation="0 0 0">
+        <a-box shadow="cast: true" position="-1 0.5 -3" rotation="0 45 0" color="#D72638"></a-box>
+        <a-sphere shadow="cast: true" position="0 1.25 -5" radius="1.25" color="#F2B880"></a-sphere>
+        <a-cylinder shadow="cast: true" position="1 0.75 -3" radius="0.5" height="1.5" color="#DB93B0"></a-cylinder>
+        <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
+      </a-entity>
+      <a-entity rotation="0 -90 0">
+        <a-box shadow="cast: true" position="-1 0.5 -3" rotation="0 45 0" color="#F49D37"></a-box>
+        <a-sphere shadow="cast: true" position="0 1.25 -5" radius="1.25" color="#CDA2AB"></a-sphere>
+        <a-cylinder shadow="cast: true" position="1 0.75 -3" radius="0.5" height="1.5" color="#966B9D"></a-cylinder>
+        <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
+      </a-entity>
+      <a-entity rotation="0 180 0">
+        <a-box shadow="cast: true" position="-1 0.5 -3" rotation="0 45 0" color="#23967F"></a-box>
+        <a-sphere shadow="cast: true" position="0 1.25 -5" radius="1.25" color="#8A89C0"></a-sphere>
+        <a-cylinder shadow="cast: true" position="1 0.75 -3" radius="0.5" height="1.5" color="#54C6EB"></a-cylinder>
+        <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
+      </a-entity>
+      <a-entity light="type: ambient; color: #BBB; intensity: 0.6"></a-entity>
+      <a-entity light="type: directional; color: #FFF; intensity: 0.7; castShadow:true; shadowCameraVisible: true; shadowCameraLeft: -15; shadowCameraRight: 15; shadowCameraBottom: -15; shadowCameraTop: 15" position="-0.5 1 1"></a-entity>
+      <a-plane shadow="receive: true" position="0 0 0" rotation="-90 0 0" width="15" height="15" color="#AEADF0"></a-plane>
+      <a-sky color="#ECECEC"></a-sky>
+
+    </a-scene>
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Video</title>
+    <meta name="description" content="Video - A-Frame">
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="js/play-on-click.js"></script>
+    <script src="js/hide-on-play.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <!--
+        SOURCE
+        Author: Bitmovin
+        URL:    https://bitmovin.com/demos/vr-360
+        -->
+        <video id="video"
+               loop
+               crossorigin="anonymous"
+               playsinline webkit-playsinline
+               src="https://cdn.glitch.global/106f103a-0f9e-4584-acb6-7c1f5eae8584/enhanced_injected.mp4?v=1704509140872">
+        </video>
+      </a-assets>
+      <a-videosphere
+        rotation="0 -90 0" src="#video"
+        play-on-click>
+      </a-videosphere>
+
+      <a-camera>
+        <a-entity
+          position="0 0 -1.5"
+          text="align:center;
+                width:6;
+                wrapCount:100;
+                color: white;
+                value: Click or tap to start video"
+          hide-on-play="#video">
+        </a-entity>
+      </a-camera>
+    </a-scene>
+  </body>
+</html>
