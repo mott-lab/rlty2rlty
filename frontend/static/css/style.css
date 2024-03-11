@@ -16,6 +16,14 @@ h1, h2, h3, h4, h5, h6 {
   width: 50%;
 }
 
+.single-line-text-input {
+  background-color: #303030;
+  border-color: white !important;
+  color: white;
+  font-size: 1.3em;
+  width: 50%;
+}
+
 .seedfield {
   background-color: #303030;
   border-color: white !important;
@@ -27,9 +35,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .ex_btn {
-  margin-top: 0.5em;
-  margin-right: 0.5em;
-  font-size: 1.1em;
+  margin-top: 0em;
+  margin-right: 0em;
+  margin-left: 0.5em;
+  font-size: 15pt;
+  padding: 0 0.5em;
+  border-color: cyan !important;
+  color: cyan !important;
 }
 
 .ex_txt {
@@ -85,4 +97,59 @@ p {
 
 .whitetext {
   color: white;
+}
+
+#overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #333333e0; /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: wait; /* Add a pointer on hover */
+}
+
+#overlayText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 20px;
+  color: cyan;
+  background-color: black;
+  transform: translate(-50%,-50%);
+  -ms-transform: translate(-50%,-50%);
+  padding: 0 20px;
+}
+
+.env_img_div {
+  
+}
+
+.env_img_preview {
+  max-width: 400px;
+  /* max-height: 400px; */
+}
+
+.arrow {
+  font-size: 30pt;
+  vertical-align: middle;
+  height: auto;
+  margin: auto;
+  width: 50%;
+}
+
+.autoexpandheight {
+  /* height: 100%;
+   */
+   flex: 1;
+   margin:auto;
+}
+
+.flexrow {
+  display:flex;
+  width: 100%;
 }

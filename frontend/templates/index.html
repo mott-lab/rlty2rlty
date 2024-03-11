@@ -15,99 +15,118 @@
       </h1>
 
       <hr>
-
       
+      <div class="input_row w3-row" >
+        <h1>
+          base images
+        </h1>
 
-      <h1>
-        base images
-      </h1>
+        <div class="whitetext" style="font-size: 1.3em; margin-bottom: 1em;">
+          choose images between which you would like to generate a transition, or: 
+          <button id="take_photo_btn" class="w3-button w3-black w3-border ex_btn">take new photo</button>
+        </div>
 
-      <div class="whitetext" style="font-size: 1.3em; margin-bottom: 1em;">
-        choose images between which you would like to generate a transition. 
-        <!-- you can break the prompt down into three components: content (what you want to see), media form, and style. -->
-      </div>
+        <div class="w3-row flexrow">
 
-      <div class="input_row" >
-        <button id="take_photo_btn" class="w3-button w3-black w3-border ex_btn" >take new photo</button>
-        
-        <label for="start_img" style="padding-top: 1em;">Starting image:</label>
+          <div class="w3-col s3">
+            <div class="env_img_div">
 
-        <select name="start_img" id="start_img" style="margin-top: 1em;">
-          <option value="volvo"><< Most recent 360 photo >></option>
-          <option value="audi">360 photo: Magic Kingdom</option>
-          <option value="audi">360 photo: Home Office</option>
-          <option value="saab">Virtual Environment: Office</option>
-          <option value="mercedes">Virtual Environment: Nature</option>
-        </select>
-  
-        <label for="end_img" class="leftpad" style="padding-top: 1em;">Ending image:</label>
-  
-        <select name="end_img" id="end_img" style="margin-top: 1em;">
-          <option value="volvo"><< Most recent 360 photo >></option>
-          <option value="audi">360 photo: Magic Kingdom</option>
-          <option value="audi">360 photo: Home Office</option>
-          <option value="saab">Virtual Environment: Office</option>
-          <option value="mercedes">Virtual Environment: Nature</option>
-        </select>
+              <div class="w3-row">
+                <label for="start_img" style="padding-top: 1em;">Starting image:</label>
+              </div>
+              <div class="w3-row">
+                <img id="start_img_preview" class="env_img_preview">
+              </div>
+              <div class="w3-row">
+                <select name="start_img" id="start_img_select" style="margin-top: 1em;">
+                  <option value="Most Recent 360"><< Most recent 360 photo >></option>
+                </select>
+              </div>
 
+            </div>
+          </div>
+
+          <div class="w3-col s2 autoexpandheight">
+            <div class="env_img_div arrow">
+                &#8658;
+            </div>
+          </div>
+          
+          <div class="w3-col s5">
+            <div class="env_img_div">
+
+              <div class="w3-row">
+                <label for="end_img" style="padding-top: 1em;">Ending image:</label>
+              </div>
+              <div class="w3-row">
+                <img id="end_img_preview" class="env_img_preview">
+              </div>
+              <div class="w3-row">
+                <select name="end_img" id="end_img_select" style="margin-top: 1em;">
+                  <option value="Most Recent 360"><< Most recent 360 photo >></option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
       </div>
 
       <hr>
 
-      <h1>
-        prompt
-      </h1>
-
-      <div class="whitetext" style="font-size: 1.3em;">
-        describe a liminal space you would like to see when transitioning between the start and end images. 
-        <!-- you can break the prompt down into three components: content (what you want to see), media form, and style. -->
-      </div>
-
-      <br>
-
       <div class="input_row">
-        <label for="prompt_content">content</label>
-        <textarea id="prompt_content" class="w3-input w3-border w3-animate-input textfield" type="text"></textarea>
-        <div>
-          <button id="content_btn" class="w3-button w3-black w3-border ex_btn">for example:</button>
-          <span id="content_ex" class="input_caption ex_txt">
-            kaleidoscopic view of a future apartment in the year 3000
-          </span>
+        <h1>
+          prompt
+        </h1>
+
+        <div class="whitetext" style="font-size: 1.3em;">
+          describe a liminal space you would like to see when transitioning between the start and end images.
+        </div>
+
+        <!-- <br> -->
+
+        <div class="">
+          <label for="prompt_content"> </label>
+          <textarea id="prompt_content" class="w3-input w3-border w3-animate-input textfield" type="text"></textarea>
+          <!-- <div>
+            <button id="content_btn" class="w3-button w3-black w3-border ex_btn">for example:</button>
+            <span id="content_ex" class="input_caption ex_txt">
+              kaleidoscopic view of a future apartment in the year 3000
+            </span>
+          </div> -->
         </div>
       </div>
 
       <div class="space"></div>
 
-      <!-- <div class="input_row">
-        <label for="prompt_media">media</label>
-        <textarea id="prompt_media" class="w3-input w3-border w3-animate-input textfield" type="text"></textarea>
-        <button id="media_btn" class="w3-button w3-black w3-border ex_btn">for example:</button>
-          <span id="media_ex" class="input_caption ex_txt">
-            360 photo
-          </span>
-      </div>
-
-      <div class="space"></div> -->
-
-      <!-- <div class="input_row">
-        <label for="prompt_style">style</label>
-        <textarea id="prompt_style" class="w3-input w3-border w3-animate-input textfield" type="text"></textarea>
-        <button id="style_btn" class="w3-button w3-black w3-border ex_btn">for example:</button>
-        <span id="style_ex" class="input_caption ex_txt">
-          surrealism
-        </span>
-      </div>
-
-      <div class="space"></div> -->
-
       <hr>
 
-      <form action="/sd_request" method="POST">
+      <div class="input_row">
 
-      </form>
+        <h1>
+          metadata
+        </h1>
+
+        <div class="whitetext" style="font-size: 1.3em;">
+          enter your name or a title for your transition.
+        </div>
+
+        <!-- <br> -->
+
+        <div class="">
+          <label for="metadata"></label>
+          <input id="metadata" class="w3-input w3-border w3-animate-input single-line-text-input" type="text"></input>
+        </div>
+
+        <div class="space"></div>
+
+        <form action="/sd_request" method="POST">
+
+        </form>
+      </div>
+      <hr>
       <button id="submit_btn" class="w3-button w3-black w3-border ex_btn">generate transition</button>
-
-      <hr>
 
       <!-- <div class="input_row slider_row">
         <label>
@@ -125,38 +144,23 @@
 
       </div> -->
 
-      <!-- <hr> -->
-
-      <div class="input_row">
-        <label>
-          random seed
-        </label>
-        <input id="rand_seed" class="w3-input w3-border seedfield" type="number" value="42">
-        <input id="same_seed" class="w3-check" type="checkbox" checked="checked">
-        <label>keep seed the same</label>
-        <p class="input_caption">
-          seed for random number generator. check the box above to keep this the same across generations to observe how changes in the prompt affect the output.
-        </p>
+    </div>
+    <div id="overlay">
+      <div id="overlayText">
+        <h1>Generating transition<span id="underscore2" style="visibility: visible;">_</span></h1>
+        <hr>
+        <h3>check the terminal window to monitor progress.</h3>
       </div>
-
-      <hr>
-
-      <!-- <p>
-        prompt to be sent: <span id="full_prompt"></span>
-      </p> -->
-      <p class="input_caption">
-        last seed: <span id="last_seed" class="whitetext"></span>
-      </p>
-      <p class="input_caption">
-        last prompt: <span id="last_prompt" class="whitetext"></span>
-      </p>
-      <!-- <p class="input_caption">
-        estimated time until next prompt: <span id="estimated_runtime" class="whitetext"></span> seconds.
-      </p> -->
-
     </div>
 
     <!-- <script src="index.js"></script> -->
     <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+    <script>
+      // This line is flagged in editor (VSCode) but it runs fine.
+      // It passes the end image list data from app.py script to index.js script
+      var list = {{ data.end_img_list|tojson }};
+      var path = {{ data.end_img_path|tojson }};
+      init_end_img_list(list, path);
+    </script>
   </body>
 </html>
