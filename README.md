@@ -29,6 +29,7 @@ TODO: insert links
 - ComfyUI (I use the standalone installation version)
 - Python (I am using 3.11, but should work with any Python 3)
 - Flask
+- FFmpeg. Needs to be added to your path environment variable.
 
 ## Installation and Configuration
 

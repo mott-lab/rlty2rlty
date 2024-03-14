@@ -35,8 +35,12 @@ END_ENV_IMG_PATH = GEN_SYS_PATH + "ENDENV_img/"
 END_ENV_RAW_IMG_PATH = END_ENV_IMG_PATH + "raw/"
 END_ENV_RESIZED_IMG_PATH = END_ENV_IMG_PATH + "resized/"
 
+# This line needs to point to the locaton of your REAL ESRGAN install.
+# Current line can be left alone if REALESRGAN is in the parent directory of the rlty2rlty folder.
+REALERSGAN_DIR = os.path.dirname(parent_directory) + "/Real-ESRGAN/realesrgan-ncnn-vulkan-20220424-windows"
+
 # This line needs to point to the location of your ComfyUI install.
-# Current line can be left if ComfyUI is in the parent directory of rlty2rlty folder.
+# Current line can be left alone if ComfyUI is in the parent directory of rlty2rlty folder.
 COMFYUI_DIR = os.path.dirname(parent_directory) + "/ComfyUI_windows_portable/"
 print(COMFYUI_DIR)
 
@@ -57,7 +61,7 @@ NETWORK_DRIVE_GEN_PATH = "//192.168.1.227/rlty2rlty/gen-dirs/"
 # Initialize some variables in index.js
 @app.route("/")
 def hello():
-    list_end_env_img = [f for f in listdir(END_ENV_RAW_IMG_PATH) if isfile(join(END_ENV_RAW_IMG_PATH, f))]
+    list_end_env_img = [f for f in listdir(END_ENV_RAW_IMG_PATH) if (isfile(join(END_ENV_RAW_IMG_PATH, f)) and ".png" in f )]
     data = { 
         'end_img_list' : list_end_env_img, 
         'end_img_path' : END_ENV_IMG_PATH
@@ -139,12 +143,13 @@ def sd_request():
     end_img = request.form.getlist('end_img')[0]
     cfg_scale = request.form.getlist('cfg_scale')[0] # not currently editable by user
     seed = request.form.getlist('seed')[0] # not currently editable by user
+    liminal_mode = int(request.form.getlist('liminal_mode')[0])
+    print(f"liminal_mode {liminal_mode}")
     
     seed = 10111
     steps = 20
 
-    # TODO: pass this in from frontend
-    liminal_method = 1
+    # liminal_method = 0
 
     # get last ricoh photo
     # print(">> Getting last Ricoh image...")
@@ -193,39 +198,22 @@ def sd_request():
     End_env_depth_mask = create_depth_mask_for_img(end_env_img_name, End_env_img_file_full_path)
     End_env_depth_mask = shutil.copy(End_env_depth_mask, Last_gen_dir_full_path)
 
-    
-
-    # prompt = "a sci-fi room with a portal to another dimension"
-    # prompt = "nature scene, forest with a waterfall and a river, calming, soothing, beautiful, serene"
-    # prompt = "serene, tranquil, meditative scene at sunrise, peaceful Zen garden with smooth stones, a gentle stream, and blossoming cherry trees, soft morning light filters through the foliage, faint mist rising from grass, soft and pastel color palette, gentle pinks greens and warm gold"
-    # prompt = "mesmerizing, tranquil, galactic scene, cosmos with swirling nebulas, twinkling stars, distant galaxies in a spectrum of vibrant colors, soft ethereal glow, deep blues, purples, glittering silver of distant stars"
-    # prompt = "serene, tranquil, ethereal meditative scene in a sky of billowing undulating clouds, sunrise, warm palette of pastel pinks, oranges, light blues and purples"
-    # prompt = "forest scene with a waterfall and a river, green pastures, beautiful, serene"
-    # prompt = "a vibrant and tranquil landscape, lush green meadow, various trees in full bloom, white picket fence alongside a dirt path, clear blue sky with fluffy clouds, distant hills"
-    
-#     prompt = """
-# In a liminal office space where two realities converge, the floor is a mosaic of sandy yellow paths and light grey office tiles, forming a checkerboard that bridges the desert with the corporate. The ceiling overhead is a spectacle of transformation: one half retains the open expanse of a clear blue sky, while the other half arches in segments of office-like light brown, dotted with both fluorescent lights and the whimsical floating rings of an aerial game.
-
-# Desks and computers, with their orderly array of office paraphernalia, share this space with playful geometric shapes that belong to an outdoor game, including cones and cubes resting on work surfaces and floors. Traffic cones stand in place of some office chairs, and the obstacle course rings hang in the air, occasionally looping through the arms of desk lamps.
-
-# A doorway frames a snippet of the outdoor game track, seemingly leading into the vastness of a playful landscape, while another opens to the structured confines of a corridor with yellow walls. The distant view blends low-poly trees and mountain silhouettes into the neutral tones of office partitions.
-
-# Notice boards, half-covered in blue, peek from walls that are merging the horizon of the game world with the pragmatic surfaces of an office. Lighting is a dance of sunlight and the artificial glow of an indoor work environment, casting an array of shadows that belong to neither world completely. This space is a canvas of transition, a visual narrative of two disparate environments slowly merging into a single, surreal tableau.
-# """
     prompt += ", panoramic, (360 view:1.3)" #, (360-degree:1.3), wide-angle lens"
 
     gen_steps = 25 # not needed, probably. default in comfy api call.
-    denoising_strength_arr = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    # denoising_strength_arr = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    denoising_strength_arr = [0.4, 0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0]
 
-    if liminal_method == 0:
+    #LIMINAL_MODE 0: middle section of generated liminal environment
+    if liminal_mode == 0:
         '''
         # +++ Gen for start image
         '''
         comfy_output_basename = Last_gen_dir_name + "_00"
 
-        # generate 10 images with gradually increasing denoising strength, based on most ricoh image
+        # generate 10 images with gradually increasing denoising strength, based on start env image
         for i in range(0, len(denoising_strength_arr)):
-            print(f"+++ [RICOH] queueing prompt with denoise set to {denoising_strength_arr[i]}")
+            print(f"+++ [START_ENV] queueing prompt with denoise set to {denoising_strength_arr[i]:.2f}")
             comfy.gen_from_360_singlectrl(
                 Start_env_resized_img_full_path, 
                 Start_env_img_depth_mask,
@@ -244,16 +232,19 @@ def sd_request():
             list_gen_from_ricoh_img = glob.glob(comfy_output + '*.png')
             len_list_current = len(list_gen_from_ricoh_img)
             if len_list_current != len_list_last_checked:
-                print(f"+++ [RICOH] ... generated {len_list_current}/{len(denoising_strength_arr)} based on ricoh image")
+                print(f"+++ [START_ENV] ... generated {len_list_current}/{len(denoising_strength_arr)} based on START_ENV image")
             len_list_last_checked = len_list_current
             sleep(1)
 
-        print(f"+++ [RICOH] {len(list_gen_from_ricoh_img)}/{len(denoising_strength_arr)} Completed generation. ")
+        print("\n++++++++++++++++++++++++++++++++++++++++++")
+        print(f"+++ [START_ENV] {len(list_gen_from_ricoh_img)}/{len(denoising_strength_arr)} Completed generation. ")
+        print("++++++++++++++++++++++++++++++++++++++++++\n")
+
         print(f">> Moving generated images to {Last_gen_dir_name}")
         # move ricoh images from comfyUI path to project path
         for f in list_gen_from_ricoh_img:
             img_name = os.path.basename(f)
-            print(f">> [RICOH] moving {img_name} to {Last_gen_dir_name}")
+            print(f">> [START_ENV] moving {img_name} to {Last_gen_dir_name}")
             os.rename(f, Last_gen_dir_full_path + "/gen_img/" + img_name)
 
         '''
@@ -263,7 +254,7 @@ def sd_request():
 
         # generate 10 images with gradually decreasing denoising strength, based on end env image
         for i in range(len(denoising_strength_arr) - 1, -1, -1):
-            print(f"+++ [ENDENV] queueing prompt with denoise set to {denoising_strength_arr[i]}")
+            print(f"+++ [END_ENV] queueing prompt with denoise set to {denoising_strength_arr[i]:.2f}")
             comfy.gen_from_360_singlectrl(
                 End_env_img_file_full_path, 
                 End_env_depth_mask,
@@ -282,20 +273,20 @@ def sd_request():
             list_gen_from_end_env_img = glob.glob(comfy_output + '*.png')
             len_list_current = len(list_gen_from_end_env_img)
             if len_list_current != len_list_last_checked:
-                print(f"+++ [ENDENV] ... generated {len_list_current}/{len(denoising_strength_arr)} based on end environment image")
+                print(f"+++ [END_ENV] ... generated {len_list_current}/{len(denoising_strength_arr)} based on end environment image")
             len_list_last_checked = len_list_current
             sleep(1)
 
-        print(f"+++ [ENDENV] {len(list_gen_from_end_env_img)}/{len(denoising_strength_arr)} Completed generation.")
+        print(f"+++ [END_ENV] {len(list_gen_from_end_env_img)}/{len(denoising_strength_arr)} Completed generation.")
         print(f">> Moving generated images to {Last_gen_dir_name}")
         # move endenv images from comfyUI path to project path
         for f in list_gen_from_end_env_img:
             img_name = os.path.basename(f)
-            print(f">> [ENDENV] moving {img_name} to {Last_gen_dir_name}")
+            print(f">> [END_ENV] moving {img_name} to {Last_gen_dir_name}")
             os.rename(f, Last_gen_dir_full_path + "/gen_img/" + img_name)
 
         '''
-        # +++ Gen for liminal gen between ricoh gen image and end environment gen image
+        # +++ Gen for liminal gen between start gen image and end environment gen image
         '''
         comfy_output_basename = Last_gen_dir_name + "_02"
 
@@ -304,7 +295,7 @@ def sd_request():
         ctrl_weight_2 = 0.0
         num_liminal_gen = 0
         while ctrl_weight_1 >= 0.0:
-            print(f"+++ [LIMINAL] queueing double ctrl with ctrl 1: {ctrl_weight_1}, ctrl 2: {ctrl_weight_2}")
+            print(f"+++ [LIMINAL_ENV] queueing double ctrl with ctrl 1: {ctrl_weight_1:.2f}, ctrl 2: {ctrl_weight_2:.2f}, denoise: 1.0")
             comfy.gen_from_txt2img_doublectrl(
                 Start_env_img_depth_mask, 
                 End_env_depth_mask,
@@ -315,39 +306,12 @@ def sd_request():
                 seed,
                 steps
             )
-            ctrl_weight_1 -= 0.05
-            ctrl_weight_2 += 0.05
+            ctrl_weight_1 -= 0.1
+            ctrl_weight_2 += 0.1
             num_liminal_gen += 1
 
-        # comfyUI is async, need to wait for all images to finish generating
-        comfy_output = COMFYUI_OUTPUT_DIR + comfy_output_basename
-        list_liminal_gen = glob.glob(comfy_output + '*.png')
-        len_list_last_checked = 0
-        while len(list_liminal_gen) < num_liminal_gen:
-            list_liminal_gen = glob.glob(comfy_output + '*.png')
-            len_list_current = len(list_liminal_gen)
-            if len_list_current != len_list_last_checked:
-                print(f"+++ [LIMINAL] ... generated {len_list_current}/{num_liminal_gen} based on ricoh and end env depth masks")
-            len_list_last_checked = len_list_current
-            sleep(1)
-
-        print(f"+++ [LIMINAL] {len(list_liminal_gen)}/{num_liminal_gen} Completed generation.")
-
-        print(f">> Moving generated images to {Last_gen_dir_name}")
-        # move endenv images from comfyUI path to project path
-        for f in list_liminal_gen:
-            img_name = os.path.basename(f)
-            print(f">> [LIMINAL] moving {img_name} to {Last_gen_dir_name}")
-            os.rename(f, Last_gen_dir_full_path + "/gen_img/" + img_name)
-
-        print(f">> Copy starter images to /gen_img/ and rename")
-        ricoh_copy = shutil.copy(Start_env_resized_img_full_path, Last_gen_dir_full_path + "/gen_img/")
-        end_copy = shutil.copy(End_env_img_file_full_path, Last_gen_dir_full_path + "/gen_img/")
-        os.rename(ricoh_copy, Last_gen_dir_full_path + "/gen_img/" + Last_gen_dir_name + "_00_00000_.png")
-        os.rename(end_copy, Last_gen_dir_full_path + "/gen_img/" + Last_gen_dir_name + "_03_00012_.png")
-
-    # LIMINAL_METHOD 1: always double controlnets
-    elif liminal_method == 1:
+    # LIMINAL_MODE 1: always double controlnets
+    elif liminal_mode == 1:
 
         ### OLD: no SD, just motion interpolation (melting effect)
         # start_img = shutil.move(Last_ricoh_resized_img_full_path, Last_gen_dir_full_path + "/input_img/img_1.png")
@@ -360,8 +324,6 @@ def sd_request():
         #     Last_gen_dir_name
         # )
         ####
-
-        # TODO: Fix for this liminal_method
 
         # denoising_strength_arr = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
         denoising_strength_arr = [0.4, 0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0]
@@ -378,7 +340,7 @@ def sd_request():
         ctrl_weight_2 = 0.0
         num_liminal_gen = 0
         for i in range(0, len(denoising_strength_arr)):
-            print(f"+++ [LIMINAL 1.1] queueing double ctrl with ctrl 1: {ctrl_weight_1}, ctrl 2: {ctrl_weight_2}, denoise {denoising_strength_arr[i]}")
+            print(f"+++ [LIMINAL_ENV 1.1] queueing double ctrl with ctrl 1: {ctrl_weight_1:.2f}, ctrl 2: {ctrl_weight_2:.2f}, denoise {denoising_strength_arr[i]:.2f}")
             comfy.gen_from_360_doublectrl(
                 input_360_file_path=Start_env_resized_img_full_path,
                 depth_img_1_path=Start_env_img_depth_mask, 
@@ -396,7 +358,7 @@ def sd_request():
             num_liminal_gen += 1
 
         # do one generation in the middle at controls 0.5 and 0.5 based on start image.
-        print(f"+++ [LIMINAL 1.1] queueing double ctrl with ctrl 1: {ctrl_weight_1}, ctrl 2: {ctrl_weight_2}, denoise {denoising_strength_arr[i]}")
+        print(f"+++ [LIMINAL_ENV 1.1] queueing double ctrl with ctrl 1: {ctrl_weight_1:.2f}, ctrl 2: {ctrl_weight_2:.2f}, denoise {denoising_strength_arr[i]:.2f}")
         comfy.gen_from_360_doublectrl(
             input_360_file_path=Start_env_resized_img_full_path,
             depth_img_1_path=Start_env_img_depth_mask, 
@@ -412,22 +374,24 @@ def sd_request():
 
         num_liminal_gen += 1
 
-        # do one generation in the middle at controls 0.5 and 0.5 based on end image.
-        print(f"+++ [LIMINAL 1.2] queueing double ctrl with ctrl 1: {ctrl_weight_1}, ctrl 2: {ctrl_weight_2}, denoise {denoising_strength_arr[i]}")
-        comfy.gen_from_360_doublectrl(
-            input_360_file_path=End_env_img_file_full_path,
-            depth_img_1_path=Start_env_img_depth_mask, 
-            depth_img_2_path=End_env_depth_mask,
-            controlnet_1_strength=0.5,
-            controlnet_2_strength=0.5,
-            output_filename=comfy_output_basename, 
-            text_prompt=prompt, 
-            seed=seed,
-            denoising_strength=denoising_strength_arr[i],
-            steps=steps
-        )
+        # for generations using the same image as both start and end, this step will be the same as the last
+        if Start_env_img_depth_mask != End_env_depth_mask:
+            # do one generation in the middle at controls 0.5 and 0.5 based on end image.
+            print(f"+++ [LIMINAL_ENV 1.2] queueing double ctrl with ctrl 1: {ctrl_weight_1:.2f}, ctrl 2: {ctrl_weight_2:.2f}, denoise {denoising_strength_arr[i]:.2f}")
+            comfy.gen_from_360_doublectrl(
+                input_360_file_path=End_env_img_file_full_path,
+                depth_img_1_path=Start_env_img_depth_mask, 
+                depth_img_2_path=End_env_depth_mask,
+                controlnet_1_strength=0.5,
+                controlnet_2_strength=0.5,
+                output_filename=comfy_output_basename, 
+                text_prompt=prompt, 
+                seed=seed,
+                denoising_strength=denoising_strength_arr[i],
+                steps=steps
+            )
 
-        num_liminal_gen += 1
+            num_liminal_gen += 1
 
         # generate 10 images with gradually decreasing denoising strength, based on end env image
         # start with start ctrl weight at 1, decrease to 0.5
@@ -435,7 +399,7 @@ def sd_request():
         ctrl_weight_1 = 0.45
         ctrl_weight_2 = 0.55
         for i in range(len(denoising_strength_arr) - 1, -1, -1):
-            print(f"+++ [LIMINAL 1.2] queueing double ctrl with ctrl 1: {ctrl_weight_1}, ctrl 2: {ctrl_weight_2}, denoise {denoising_strength_arr[i]}")
+            print(f"+++ [LIMINAL_ENV 1.2] queueing double ctrl with ctrl 1: {ctrl_weight_1:.2f}, ctrl 2: {ctrl_weight_2:.2f}, denoise {denoising_strength_arr[i]:.2f}")
             comfy.gen_from_360_doublectrl(
                 input_360_file_path=End_env_img_file_full_path,
                 depth_img_1_path=Start_env_img_depth_mask, 
@@ -453,34 +417,41 @@ def sd_request():
             num_liminal_gen += 1
 
         
-        # comfyUI is async, need to wait for all images to finish generating...
-        # (this is a really dumb way to wait for images, but not sure if comfyUI has callbacks)
-        comfy_output = COMFYUI_OUTPUT_DIR + comfy_output_basename
+    # comfyUI is async, need to wait for all images to finish generating...
+    # (this is a really dumb way to wait for images, but not sure if comfyUI has callbacks)
+    comfy_output = COMFYUI_OUTPUT_DIR + comfy_output_basename
+    list_liminal_gen = glob.glob(comfy_output + '*.png')
+    len_list_last_checked = 0
+    while len(list_liminal_gen) < num_liminal_gen: 
         list_liminal_gen = glob.glob(comfy_output + '*.png')
-        len_list_last_checked = 0
-        while len(list_liminal_gen) < num_liminal_gen: 
-            list_liminal_gen = glob.glob(comfy_output + '*.png')
-            len_list_current = len(list_liminal_gen)
-            if len_list_current != len_list_last_checked:
-                print(f"+++ [LIMINAL] ... generated {len_list_current}/{num_liminal_gen} based on start and end env depth masks")
-            len_list_last_checked = len_list_current
-            sleep(1)
+        len_list_current = len(list_liminal_gen)
+        if len_list_current != len_list_last_checked:
+            print(f"+++ [LIMINAL_ENV] ... generated {len_list_current}/{num_liminal_gen} based on start and end env depth masks")
+        len_list_last_checked = len_list_current
+        sleep(1)
 
-        print(f"+++ [LIMINAL] {len(list_liminal_gen)}/{num_liminal_gen} Completed generation.")
+    print("\n++++++++++++++++++++++++++++++++++++++++++")
+    print(f"+++ [LIMINAL_ENV] {len(list_liminal_gen)}/{num_liminal_gen} Completed generation.")
+    print("++++++++++++++++++++++++++++++++++++++++++\n")
+    
+    print(f">> Moving generated images to {Last_gen_dir_name}")
+    # move endenv images from comfyUI path to project path
+    for f in list_liminal_gen:
+        img_name = os.path.basename(f)
+        print(f">> [LIMINAL_ENV] moving {img_name} to {Last_gen_dir_name}")
+        os.rename(f, Last_gen_dir_full_path + "/gen_img/" + img_name)
 
-        print(f">> Moving generated images to {Last_gen_dir_name}")
-        # move endenv images from comfyUI path to project path
-        for f in list_liminal_gen:
-            img_name = os.path.basename(f)
-            print(f">> [LIMINAL] moving {img_name} to {Last_gen_dir_name}")
-            os.rename(f, Last_gen_dir_full_path + "/gen_img/" + img_name)
-
-        # TODO: Fix for this liminal_method
-        print(f">> Copy starter images to /gen_img/ and rename")
-        ricoh_copy = shutil.copy(Start_env_resized_img_full_path, Last_gen_dir_full_path + "/gen_img/")
+    print(f">> Copy starter images to /gen_img/ and rename")
+    start_env_copy = shutil.copy(Start_env_resized_img_full_path, Last_gen_dir_full_path + "/gen_img/")
+    if Start_env_img_depth_mask != End_env_depth_mask:
         end_copy = shutil.copy(End_env_img_file_full_path, Last_gen_dir_full_path + "/gen_img/")
-        os.rename(ricoh_copy, Last_gen_dir_full_path + "/gen_img/" + Last_gen_dir_name + "_00_00000_.png")
-        os.rename(end_copy, Last_gen_dir_full_path + "/gen_img/" + Last_gen_dir_name + "_03_00012_.png")
+    else:
+        end_copy_destname = Last_gen_dir_full_path + "/gen_img/" + os.path.basename(Start_env_resized_img_full_path) + "_END.png"
+        end_copy = shutil.copy(Start_env_resized_img_full_path, end_copy_destname)
+
+    # do some renaming to force start and end env images to be at the front and back of file lists, respectively
+    os.rename(start_env_copy, Last_gen_dir_full_path + "/gen_img/" + Last_gen_dir_name + "_00_00000_.png")
+    os.rename(end_copy, Last_gen_dir_full_path + "/gen_img/" + Last_gen_dir_name + "_03_00012_.png")
 
     print(f"+++ [VIDEO] Generate video from files in /gen_img/{Last_gen_dir_name}")
 
@@ -491,47 +462,58 @@ def sd_request():
         Last_gen_dir_name
     )
 
-    print("+++ [VIDEO] Waiting for video frame interpolation to complete...")
-    sleep(45)
+    vfi_time_estimate = 100
+    if liminal_mode == 1: 
+        vfi_time_estimate = 60
+
+    print(f"+++ [VIDEO] Waiting for video frame interpolation to complete...This could take about {vfi_time_estimate} seconds.")
+    # sleep(45)
+
+    vfi_time_passed = 0
     
     comfy_output = COMFYUI_OUTPUT_DIR + Last_gen_dir_name
     list_video_gen = glob.glob(comfy_output + '*.mp4')
     while len(list_video_gen) < 1:
-        # print(f"+++ [VIDEO] ... waiting for video to finish")
+        if vfi_time_passed % 5 == 0:
+            print(f"++++ [VIDEO] ... waiting for video frame interpolation. Estimated time remaining: {vfi_time_estimate - vfi_time_passed}")
         list_video_gen = glob.glob(comfy_output + '*.mp4')
+        vfi_time_passed += 1
         sleep(1)
     
     print(f"+++ [VIDEO] ... preparing to move video file")
     sleep(15)
     
     vid_file = list_video_gen[0]
+    print("\n++++++++++++++++++++++++++++++++++++++++++")
     print(f"+++ Finished generating video. Moving {vid_file} to: {Last_gen_dir_full_path}")
+    print("++++++++++++++++++++++++++++++++++++++++++\n")
     gen_video_file = shutil.move(vid_file, Last_gen_dir_full_path) 
-    # vid_name = os.path.basename(vid_file)
-    # os.rename(vid_file, Last_gen_dir_full_path + vid_name)
-    # vid_file = Last_gen_dir_full_path + vid_name
-
-    ### DEBUG
-    # gen_video_file = "C:\\Users\\SREAL\\Lab Users\\mattg\\genai\\rlty2rlty\\gen-dirs\\gen0015\\gen0015_00001.mp4"
-    # Last_gen_dir_full_path = "C:\\Users\\SREAL\\Lab Users\\mattg\\genai\\rlty2rlty\\gen-dirs\\gen0015"
-    # Last_gen_dir_name = "gen0015"
-    # os.mkdir(Last_gen_dir_full_path + "/gen_vid_frames/")
-    # os.mkdir(Last_gen_dir_full_path + "/gen_vid_frames/base/")
-    # os.mkdir(Last_gen_dir_full_path + "/gen_vid_frames/upscaled/")
-    ##### END DEBUG
 
     print(f">> Extracting frames from video {gen_video_file}...")
-    ffmpeg_extract_frames_cmd = f"ffmpeg -i \"{gen_video_file}\" -qscale:v 1 -qmin 1 -qmax 1 \"{Last_gen_dir_full_path}/gen_vid_frames/base/frame%08d.png\""
+    ffmpeg_extract_frames_cmd = f"ffmpeg -i \"{gen_video_file}\" -qscale:v 1 -qmin 1 -qmax 1 -hide_banner -stats -loglevel error \"{Last_gen_dir_full_path}/gen_vid_frames/base/frame%08d.png\""
     ffmpeg_proc = subprocess.Popen(ffmpeg_extract_frames_cmd)
     ffmpeg_proc.wait()
     print(">> Finished extracting frames with ffmpeg.")
-
-    print(">> Upscaling video frames with ESRGAN. This will take a while.")
-    realesrgan_path = "C:/Users/SREAL/Lab Users/mattg/wares/Real-ESRGAN/realesrgan-ncnn-vulkan-20220424-windows"
-    realesrgan_cmd = f"\"{realesrgan_path}/realesrgan-ncnn-vulkan.exe\" -i \"{Last_gen_dir_full_path}/gen_vid_frames/base/\" -o \"{Last_gen_dir_full_path}/gen_vid_frames/upscaled/\" -n realesr-animevideov3 -s 2 -f jpg"
+    
+    
+    realesrgan_cmd = f"\"{REALERSGAN_DIR}/realesrgan-ncnn-vulkan.exe\" -i \"{Last_gen_dir_full_path}/gen_vid_frames/base/\" -o \"{Last_gen_dir_full_path}/gen_vid_frames/upscaled/\" -n realesr-animevideov3 -s 2 -f jpg"
     realesrgan_proc = subprocess.Popen(realesrgan_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    realesrgan_proc.wait()
-    print(">> Finished upscaling frames with ESRGAN.")
+
+    esrgan_est = 60
+    if liminal_mode == 1:
+        esrgan_est = 35
+    print(f">>> Upscaling video frames with ESRGAN. This will take about {esrgan_est} seconds.")
+    while realesrgan_proc.poll() is None:
+        if esrgan_est % 5 == 0:
+            print(f">>> estimated upscale time remaining: {esrgan_est} seconds.")
+        esrgan_est -= 1
+        sleep(1)
+
+    # realesrgan_proc.wait()
+        
+    print("\n++++++++++++++++++++++++++++++++++++++++++")
+    print("+++ Finished upscaling frames with ESRGAN.")
+    print("++++++++++++++++++++++++++++++++++++++++++\n")
 
     print(">> Combining upscaled frames back into a video...")
     frame_still_duration = 0.05
@@ -541,9 +523,9 @@ def sd_request():
     w = 2880
     h = 1440
     # vid_path = f"{Last_gen_dir_full_path}/{Last_gen_dir_name}_trans_vid.mov"
-    vid_name = f"{title}_{Last_gen_dir_name}.mov"
+    vid_name = f"{title}_{Last_gen_dir_name}.avi"
     vid_path = f"{Last_gen_dir_full_path}/{vid_name}"
-    vid_path_netdrive = f"{NETWORK_DRIVE_GEN_PATH}/{Last_gen_dir_name}/{vid_name}"
+    vid_path_netdrive = f"{NETWORK_DRIVE_GEN_PATH}{Last_gen_dir_name}/{vid_name}"
     # w = 4320
     # h = 2160
     ffmpeg_combine_frames_cmd = (f"ffmpeg "
@@ -552,23 +534,18 @@ def sd_request():
                                 f"-vf "
                                 f"zoompan=d={(frame_still_duration + xfade_duration) / xfade_duration}:s={w}x{h}:fps={1.0 / xfade_duration},"
                                 f"framerate=30:interp_start=0:interp_end=255:scene=100 "
-                                # f"-c:v prores_ks -profile:v 2 -qscale:v 15 -pix_fmt yuv422p10le -fps_mode vfr "
-                                # f"-c:v libx264 -profile:v main -g 1 -crf 7 -bf 0 -pix_fmt yuv420p -fps_mode vfr " # pxfmt was yuv422p. profile was main
-                                # f"-c:v dnxhd -profile:v dnxhr_sq -pix_fmt yuv422p " #problem
-                                # f"-c:v cfhd -pix_fmt yuv422p " #problem
-                                # f"-c:v mjpeg -qscale:v 1 -pix_fmt yuvj422p -fps_mode vfr "
-                                # f"-c:v hevc_nvenc -pix_fmt yuv420p -fps_mode vfr "
-                                # f"-c:v hevc_nvenc -profile:v main -preset slow -pix_fmt yuv420p -fps_mode vfr "
-                                f"-c:v mjpeg -qscale:v 1 -pix_fmt yuv444p -fps_mode vfr "
-                                # f"-b:v 3500K -maxrate 3500K -bufsize 2000K "
+                                # f"-c:v mjpeg -qscale:v 1 -pix_fmt yuvj444p -fps_mode vfr -color_range 2 "
+                                f"-c:v mjpeg -qscale:v 1 "
+                                f"-hide_banner -stats -loglevel error "
                                 f"\"{vid_path}\"")
 
     ffmpeg_combine_proc = subprocess.Popen(ffmpeg_combine_frames_cmd)
     ffmpeg_combine_proc.wait()
     print(">> Finished combining upscaled frames into video.")
 
-    print(">> Removing gen_vid_frames folder.")
-    shutil.rmtree(f"{Last_gen_dir_full_path}/gen_vid_frames/")
+    #### REMOVE FOR DEBUG
+    # print(">> Removing gen_vid_frames folder.")
+    # shutil.rmtree(f"{Last_gen_dir_full_path}/gen_vid_frames/")
 
     # Spatial media metadata only required for viewing the video through a standard video player\
     # e.g., YouTube or VLC. Applied to a skybox in Unity, it is not needed.
@@ -579,24 +556,18 @@ def sd_request():
     # inject_proc = subprocess.Popen(inject_cmd)
     # inject_proc.wait()
 
-    # TODO:
-    # copy video to unity path with transition videos
-    # rename it there? 
-    # copy prompt data to unity path as well
-
-
     print(">> Writing generation data to file.")
 
-    transition_prompt_data = f"{start_img}\n{end_img}\n{title}\n{prompt}\n{seed}\n{vid_path}\n{vid_path_netdrive}"
+    transition_prompt_data = f"{start_img}\n{end_img}\n{title}\n{prompt}\n{seed}\n{vid_path}\n{vid_path_netdrive}\n{liminal_mode}"
     print(transition_prompt_data)
 
-    # write transition prompt data to file
+    # write transition prompt data to text file. This can be read in Unity.
     with open(Last_gen_dir_full_path + f'/{Last_gen_dir_name}.txt', 'w') as file:
         file.write(transition_prompt_data)
 
-    print(">>>>                               <<<<")
+    print("\n>>>>                               <<<<")
     print(">> All done. Responding to frontend. <<")
-    print(">>>>                               <<<<")
+    print(">>>>                               <<<<\n")
     
     runtime = 0
     response = jsonify({ 'video_path': vid_path })
@@ -684,6 +655,9 @@ def prep_resized_photo_for_processing(img_new_name):
 #############################
 # sd_request()
 
+#############################
+# OLD
+#############################
 def sd_request_webui(prompt, cfg_scale, seed):
 
     start_time = time.time()

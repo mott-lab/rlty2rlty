@@ -153,3 +153,13 @@ p {
   display:flex;
   width: 100%;
 }
+
+.radio-label {
+  margin-right: 1em;
+}
+
+.radio-description {
+  padding-left: 0.5em;
+  color: lightgrey;
+  font-size: 0.8em;
+}

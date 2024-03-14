@@ -19,12 +19,13 @@
       <div class="input_row w3-row" >
         <h1>
           base images
+          <span class="whitetext" style="color: lightgray; font-size: 0.7em; margin-bottom: 1em;">
+            choose images between which you would like to generate a transition:
+            <!-- , or: 
+            <button id="take_photo_btn" class="w3-button w3-black w3-border ex_btn">take new photo</button> -->
+            </span>
         </h1>
 
-        <div class="whitetext" style="font-size: 1.3em; margin-bottom: 1em;">
-          choose images between which you would like to generate a transition, or: 
-          <button id="take_photo_btn" class="w3-button w3-black w3-border ex_btn">take new photo</button>
-        </div>
 
         <div class="w3-row flexrow">
 
@@ -38,7 +39,7 @@
                 <img id="start_img_preview" class="env_img_preview">
               </div>
               <div class="w3-row">
-                <select name="start_img" id="start_img_select" style="margin-top: 1em;">
+                <select class="w3-select" name="start_img" id="start_img_select" style="margin-top: 1em;">
                   <option value="Most Recent 360"><< Most recent 360 photo >></option>
                 </select>
               </div>
@@ -62,7 +63,7 @@
                 <img id="end_img_preview" class="env_img_preview">
               </div>
               <div class="w3-row">
-                <select name="end_img" id="end_img_select" style="margin-top: 1em;">
+                <select class="w3-select" name="end_img" id="end_img_select" style="margin-top: 1em;">
                   <option value="Most Recent 360"><< Most recent 360 photo >></option>
                 </select>
               </div>
@@ -78,11 +79,11 @@
       <div class="input_row">
         <h1>
           prompt
+          <span class="whitetext" style="color: lightgray; font-size: 0.7em;">
+            describe a liminal space you would like to see when transitioning between the start and end images.
+          </span>
         </h1>
 
-        <div class="whitetext" style="font-size: 1.3em;">
-          describe a liminal space you would like to see when transitioning between the start and end images.
-        </div>
 
         <!-- <br> -->
 
@@ -95,6 +96,27 @@
               kaleidoscopic view of a future apartment in the year 3000
             </span>
           </div> -->
+          <div class="w3-row" style="margin-top: 1em;">
+            <label for="lim_mode_select">liminal duration</label>
+          </div>
+          <div class="w3-row">
+            <!-- <form> -->
+              <label class="radio-label">
+                <input class="w3-radio" name="liminal_mode" value="0" id="liminal_mode_0" type="radio" checked>
+                long <span class="radio-description">&nbsp;&nbsp;For "visual excursions" you want to travel through. Works well with descriptive prompts.</span>
+              </label>
+              <br>
+              
+              <label class="radio-label">
+                <input class="w3-radio" name="liminal_mode" value="1" id="liminal_mode_1" type="radio" >
+                short <span class="radio-description">For morphing the start environment into the end environment. Works well with abstract prompts, e.g., with the words "abstract, formless, swirling"</span>
+              </label>
+            <!-- </form> -->
+            <!-- <select name="lim_mode_select" id="lim_mode_select">
+              <option value="lim_0">short</option>
+              <option value="lim_1">long</option>
+            </select> -->
+          </div>
         </div>
       </div>
 
@@ -106,11 +128,11 @@
 
         <h1>
           metadata
+          <span class="whitetext" style="color:lightgray; font-size: 0.7em;">
+            enter your name or a title for your transition.
+          </span>
         </h1>
 
-        <div class="whitetext" style="font-size: 1.3em;">
-          enter your name or a title for your transition.
-        </div>
 
         <!-- <br> -->
 
