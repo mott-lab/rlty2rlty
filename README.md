@@ -1,4 +1,4 @@
-**this repo is currently under construction**
+**this repo is currently under construction.**
 If you are interested in running this project yourself, feel free to contact me at matthew.gottsacker@ucf.edu.
 
 # rlty2rlty
