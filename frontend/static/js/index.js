@@ -56,6 +56,8 @@ var same_seed = document.getElementById("same_seed");
 var list_env_img_files;
 var env_img_basepath;
 
+var liminal_mode_0_check = document.getElementById("liminal_mode_0");
+var liminal_mode_1_check = document.getElementById("liminal_mode_1");
 var start_img_select = document.getElementById("start_img_select");
 var end_img_select = document.getElementById("end_img_select");
 var start_img_preview = document.getElementById("start_img_preview");
@@ -75,7 +77,7 @@ end_img_select.addEventListener('change', function() {
   var full_filename = filename + "_resized" + filesuffix;
   // start_img_preview.src = env_img_basepath + "resized/" + filename + "_resized" + filesuffix;
   set_env_img_preview_src(end_img_preview, full_filename);
-})
+});
 
 function set_env_img_preview_src(img_elt, full_filename) {
 
@@ -154,7 +156,19 @@ submit_btn.onclick = async function() {
   interface_data.append("end_img", end_img_select.value);
   interface_data.append("prompt", prompt_str);
   interface_data.append("cfg_scale", 7);
-  interface_data.append("seed", 42)
+  interface_data.append("seed", 42);
+
+  var liminal_mode = 0;
+  if (liminal_mode_0_check.checked) {
+    liminal_mode = 0;
+  } else if (liminal_mode_1_check.checked) {
+    liminal_mode = 1;
+  }
+  
+  interface_data.append("liminal_mode", liminal_mode);
+
+  // console.log(liminal_mode);
+  // return;
 
   const response = await fetch("http://localhost:5000/sd_request", {
     method: "POST",
