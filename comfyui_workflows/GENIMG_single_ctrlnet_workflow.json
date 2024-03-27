@@ -1,0 +1,640 @@
+{
+  "last_node_id": 67,
+  "last_link_id": 16,
+  "nodes": [
+    {
+      "id": 4,
+      "type": "CheckpointLoaderSimple",
+      "pos": [
+        100,
+        130
+      ],
+      "size": {
+        "0": 315,
+        "1": 98
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            12
+          ],
+          "shape": 3
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            13
+          ],
+          "shape": 3
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            4,
+            7
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CheckpointLoaderSimple"
+      },
+      "widgets_values": [
+        "sd_xl_base_1.0_0.9vae.safetensors"
+      ]
+    },
+    {
+      "id": 6,
+      "type": "CLIPTextEncode",
+      "pos": [
+        930,
+        130
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            14
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "Amidst a tranquil checkerboard floor where desert sands harmoniously interlace with the calm order of office tiles, the ceiling softly transitions from the serene blue of a clear sky to a soothing light brown office canopy, accented with gentle fluorescent lights and floating rings that hover like clouds. Office desks and chairs are thoughtfully interspersed with zen-like geometric shapes and traffic cones that evoke a sense of playful stillness. Doorways stand as portals to reflection, one leading to a contemplative outdoor track and the other to a peaceful office corridor. Distant low-poly trees and mountains subtly give way to the understated grey of meditative office walls, all bathed in a blend of natural and artificial light that casts a tranquil glow, creating a serene space where two worlds converge in quiet unity., panoramic, (360 view:1.3)"
+      ]
+    },
+    {
+      "id": 7,
+      "type": "CLIPTextEncode",
+      "pos": [
+        930,
+        460
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            10
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "(text:1.3), (watermark:1.2), (deformed:1.2)"
+      ]
+    },
+    {
+      "id": 17,
+      "type": "VAEDecode",
+      "pos": [
+        2262.4000244140625,
+        130
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 3
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            5
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 19,
+      "type": "SaveImage",
+      "pos": [
+        2572.4000244140625,
+        130
+      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 5
+        }
+      ],
+      "properties": {},
+      "widgets_values": [
+        "gen0010_00"
+      ]
+    },
+    {
+      "id": 49,
+      "type": "LoadImage",
+      "pos": [
+        100,
+        358
+      ],
+      "size": [
+        315,
+        314
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            6
+          ],
+          "shape": 3
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "C:\\Users\\SREAL\\Lab Users\\mattg\\genai\\rlty2rlty/gen-dirs/gen0010\\Interactive Game_resized.png",
+        "image"
+      ]
+    },
+    {
+      "id": 50,
+      "type": "VAEEncode",
+      "pos": [
+        515,
+        386
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 6
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            11
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEEncode"
+      }
+    },
+    {
+      "id": 57,
+      "type": "Asymmetric Tiled KSampler",
+      "pos": [
+        1847.4000244140625,
+        130
+      ],
+      "size": {
+        "0": 315,
+        "1": 310
+      },
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 8
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 9
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 10
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 11
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            3
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Asymmetric Tiled KSampler"
+      },
+      "widgets_values": [
+        1011,
+        "randomize",
+        1,
+        0,
+        22,
+        10,
+        "dpmpp_3m_sde_gpu",
+        "exponential",
+        0.8
+      ]
+    },
+    {
+      "id": 58,
+      "type": "LoraLoader",
+      "pos": [
+        515,
+        130
+      ],
+      "size": {
+        "0": 315,
+        "1": 126
+      },
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 12
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 13
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            8
+          ],
+          "shape": 3
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            1,
+            2
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoraLoader"
+      },
+      "widgets_values": [
+        "View360.safetensors",
+        1,
+        1
+      ]
+    },
+    {
+      "id": 61,
+      "type": "ControlNetLoader",
+      "pos": [
+        100,
+        590
+      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "CONTROL_NET",
+          "type": "CONTROL_NET",
+          "links": [
+            15
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ControlNetLoader"
+      },
+      "widgets_values": [
+        "t2i-adapter-depth-midas-sdxl-1.0.safetensors"
+      ]
+    },
+    {
+      "id": 66,
+      "type": "LoadImage",
+      "pos": [
+        100,
+        778
+      ],
+      "size": [
+        315,
+        314
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            16
+          ],
+          "shape": 3
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "C:\\Users\\SREAL\\Lab Users\\mattg\\genai\\rlty2rlty/gen-dirs/gen0010\\Interactive Game_resized_DEPTH_00006_.png",
+        "image"
+      ]
+    },
+    {
+      "id": 67,
+      "type": "ControlNetApply",
+      "pos": [
+        1430,
+        130
+      ],
+      "size": {
+        "0": 317.4000244140625,
+        "1": 98
+      },
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 14
+        },
+        {
+          "name": "control_net",
+          "type": "CONTROL_NET",
+          "link": 15
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 16
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            9
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ControlNetApply"
+      },
+      "widgets_values": [
+        1
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      58,
+      1,
+      6,
+      0,
+      "CLIP"
+    ],
+    [
+      2,
+      58,
+      1,
+      7,
+      0,
+      "CLIP"
+    ],
+    [
+      3,
+      57,
+      0,
+      17,
+      0,
+      "LATENT"
+    ],
+    [
+      4,
+      4,
+      2,
+      17,
+      1,
+      "VAE"
+    ],
+    [
+      5,
+      17,
+      0,
+      19,
+      0,
+      "IMAGE"
+    ],
+    [
+      6,
+      49,
+      0,
+      50,
+      0,
+      "IMAGE"
+    ],
+    [
+      7,
+      4,
+      2,
+      50,
+      1,
+      "VAE"
+    ],
+    [
+      8,
+      58,
+      0,
+      57,
+      0,
+      "MODEL"
+    ],
+    [
+      9,
+      67,
+      0,
+      57,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      10,
+      7,
+      0,
+      57,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      11,
+      50,
+      0,
+      57,
+      3,
+      "LATENT"
+    ],
+    [
+      12,
+      4,
+      0,
+      58,
+      0,
+      "MODEL"
+    ],
+    [
+      13,
+      4,
+      1,
+      58,
+      1,
+      "CLIP"
+    ],
+    [
+      14,
+      6,
+      0,
+      67,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      15,
+      61,
+      0,
+      67,
+      1,
+      "CONTROL_NET"
+    ],
+    [
+      16,
+      66,
+      0,
+      67,
+      2,
+      "IMAGE"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}
