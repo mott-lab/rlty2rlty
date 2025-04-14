@@ -30,20 +30,20 @@ If you want to use/edit the ComfyUI workflows in your own instance of ComfyUI, t
 - Flask
 - FFmpeg. Needs to be added to your path environment variable.
 
-- Models:
-t2i-adapter-depth-midas-sdxl-1.0.safetensors (MiDaS depth adapter)
-View360.safetensors (360 Redmond LoRA)
-sd_xl_base_1.0_0.9vae.safetensors (SDXL v1.0)
-rife49.pth (RIFE Realtime Intermediate Flow Estimation)
+Models:
+- t2i-adapter-depth-midas-sdxl-1.0.safetensors (MiDaS depth adapter)
+- View360.safetensors (360 Redmond LoRA)
+- sd_xl_base_1.0_0.9vae.safetensors (SDXL v1.0)
+- rife49.pth (RIFE Realtime Intermediate Flow Estimation)
 
-- Nodes (should be searchable in ComfyUI Manager):
-Fannovel16 ComfyUI ControlNet Auxiliary Preprocessors
-Fannovel16 ComfyUI Frame Interpolation
-jags111 Efficiency Nodes for ComfyUI Version 2.0+
-ssitu UltimateSDUpscale
-Kosinkadink ComfyUI-VideoHelperSuite
-FlyingFireCo tiled_ksampler
-Kosinkadink AnimateDiff Evolved
+Nodes (should be searchable in ComfyUI Manager):
+- Fannovel16 ComfyUI ControlNet Auxiliary Preprocessors
+- Fannovel16 ComfyUI Frame Interpolation
+- jags111 Efficiency Nodes for ComfyUI Version 2.0+
+- ssitu UltimateSDUpscale
+- Kosinkadink ComfyUI-VideoHelperSuite
+- FlyingFireCo tiled_ksampler
+- Kosinkadink AnimateDiff Evolved
 
 
 ## Installation and Configuration
