@@ -25,12 +25,26 @@ If you want to use/edit the ComfyUI workflows in your own instance of ComfyUI, t
 
 ## Dependencies
 
-TODO: insert links
-
 - ComfyUI (I use the standalone installation version)
 - Python (I am using 3.11, but should work with any Python 3)
 - Flask
 - FFmpeg. Needs to be added to your path environment variable.
+
+- Models:
+t2i-adapter-depth-midas-sdxl-1.0.safetensors (MiDaS depth adapter)
+View360.safetensors (360 Redmond LoRA)
+sd_xl_base_1.0_0.9vae.safetensors (SDXL v1.0)
+rife49.pth (RIFE Realtime Intermediate Flow Estimation)
+
+- Nodes (should be searchable in ComfyUI Manager):
+Fannovel16 ComfyUI ControlNet Auxiliary Preprocessors
+Fannovel16 ComfyUI Frame Interpolation
+jags111 Efficiency Nodes for ComfyUI Version 2.0+
+ssitu UltimateSDUpscale
+Kosinkadink ComfyUI-VideoHelperSuite
+FlyingFireCo tiled_ksampler
+Kosinkadink AnimateDiff Evolved
+
 
 ## Installation and Configuration
 
@@ -51,8 +65,6 @@ They should have a 2:1 aspect ratio, but they can be any resolution.
 The program will automatically resize them to the proper size for processing and copy them into the `ENDENV_img/resized/` directory.
 
 ## Running
-
-TODO: consider what should happen if user does not enter anything as a liminal prompt. LLM-generated? I guess not since that would require a GPT key... Skip liminal space?
 
 1. Run the front-end web interface. 
 Open a command line interface in the `frontend` directory and enter the command `flask run`.
